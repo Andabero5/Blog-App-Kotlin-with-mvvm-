@@ -1,6 +1,7 @@
 package com.example.blogapp.data.model
 
-import java.security.Timestamp
+import com.google.firebase.Timestamp
+
 
 data class Post(
     val profilePicture: String = "",
