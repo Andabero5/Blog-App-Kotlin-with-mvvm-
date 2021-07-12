@@ -1,9 +1,8 @@
-package com.example.blogapp.data.remote
+package com.example.blogapp.data.remote.home
 
 import com.example.blogapp.core.Resource
 import com.example.blogapp.data.model.Post
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.tasks.await
 
 
