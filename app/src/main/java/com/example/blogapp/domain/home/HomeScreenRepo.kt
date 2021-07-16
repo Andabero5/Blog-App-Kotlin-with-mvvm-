@@ -1,8 +1,8 @@
 package com.example.blogapp.domain.home
 
-import com.example.blogapp.core.Resource
+import com.example.blogapp.core.Result
 import com.example.blogapp.data.model.Post
 
 interface HomeScreenRepo {
-    suspend fun getLastestPost(): Resource<List<Post>>
+    suspend fun getLastestPost(): Result<List<Post>>
 }
