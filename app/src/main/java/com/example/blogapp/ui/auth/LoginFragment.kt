@@ -14,6 +14,8 @@ import com.example.blogapp.presentation.auth.AuthViewModel
 import com.example.blogapp.presentation.auth.AuthViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.example.blogapp.core.Result
+import com.example.blogapp.core.hide
+import com.example.blogapp.core.show
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -35,8 +37,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
 
     private fun isUserLoggedIn() {
-        firebaseAuth.currentUser?.let {
-            findNavController().navigate(R.id.action_loginFragment_to_homeScreenFragment)
+        firebaseAuth.currentUser?.let { user ->
+            if (user.displayName.isNullOrEmpty()) {
+                findNavController().navigate(R.id.action_loginFragment_to_setupProfileFragment)
+            } else {
+                findNavController().navigate(R.id.action_loginFragment_to_homeScreenFragment)
+            }
         }
     }
 
@@ -50,7 +56,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     }
 
-    private fun goToSignUpPage(){
+    private fun goToSignUpPage() {
         binding.txtSignUp.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
@@ -69,20 +75,25 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     }
 
     private fun signIn(email: String, password: String) {
-        viewModel.signIn(email,password).observe(viewLifecycleOwner, {
-            when (it){
+        viewModel.signIn(email, password).observe(viewLifecycleOwner, {
+            when (it) {
                 is Result.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressBar.show()
                     binding.btnSignIn.isEnabled = false
                 }
                 is Result.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    findNavController().navigate(R.id.action_loginFragment_to_homeScreenFragment)
+                    binding.progressBar.hide()
+                    if (it.data?.displayName.isNullOrEmpty()) {
+                        findNavController().navigate(R.id.action_loginFragment_to_setupProfileFragment)
+                    } else {
+                        findNavController().navigate(R.id.action_loginFragment_to_homeScreenFragment)
+                    }
                 }
                 is Result.Failure -> {
-                    binding.progressBar.visibility = View.GONE
+                    binding.progressBar.hide()
                     binding.btnSignIn.isEnabled = true
-                    Toast.makeText(requireContext(),"Error ${it.exception}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "Error ${it.exception}", Toast.LENGTH_LONG)
+                        .show()
                 }
             }
         })
