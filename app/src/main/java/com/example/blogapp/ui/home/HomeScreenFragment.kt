@@ -16,7 +16,7 @@ import com.example.blogapp.core.Result
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
-    lateinit var binding: FragmentHomeScreenBinding
+    private lateinit var binding: FragmentHomeScreenBinding
     private val viewModel by viewModels<HomeScreenViewModel>{HomeScreenViewModelFactory(
         HomeScreenRepoImplements(HomeScreenDataSource())
     )}

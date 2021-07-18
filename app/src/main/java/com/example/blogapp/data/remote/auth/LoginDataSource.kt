@@ -36,7 +36,7 @@ class LoginDataSource {
         imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val downloadUrl =
             imageRef.putBytes(baos.toByteArray()).await().storage.downloadUrl.await().toString()
-        val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName("")
+        val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(username)
             .setPhotoUri(Uri.parse(downloadUrl)).build()
         user?.updateProfile(profileUpdates)?.await()
     }
