@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.blogapp.core.BaseViewHolder
+import com.example.blogapp.core.TimeAgo
 import com.example.blogapp.core.hide
 import com.example.blogapp.data.model.Post
 import com.example.blogapp.databinding.PostItemViewBinding
@@ -35,7 +36,10 @@ class HomeScreenAdapter(private val postList: List<Post>) :
             Glide.with(context).load(item.postImage).centerCrop().into(binding.postImage)
             Glide.with(context).load(item.profilePicture).centerCrop().into(binding.profilePicture)
             binding.profileName.text = item.profileName
-            binding.postTimeStamp.text = "Hace 2 horas"
+            val createdAt = (item.createdAt?.time?.div(1000L))?.let{
+                TimeAgo.getTimeAgo(it.toInt())
+            }
+            binding.postTimeStamp.text = createdAt
             if (item.postDescription.isEmpty()) {
                 binding.postDescription.hide()
             } else {

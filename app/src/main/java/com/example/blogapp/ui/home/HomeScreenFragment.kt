@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.example.blogapp.R
 import com.example.blogapp.ui.home.adapter.HomeScreenAdapter
 import com.example.blogapp.data.remote.home.HomeScreenDataSource
@@ -13,6 +14,7 @@ import com.example.blogapp.domain.home.HomeScreenRepoImplements
 import com.example.blogapp.presentation.HomeScreenViewModel
 import com.example.blogapp.presentation.HomeScreenViewModelFactory
 import com.example.blogapp.core.Result
+import com.example.blogapp.core.*
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
@@ -25,13 +27,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeScreenBinding.bind(view)
 
-        viewModel.fetchLatestPost().observe(viewLifecycleOwner, { result->
+        viewModel.fetchLatestPost().observe(viewLifecycleOwner, Observer { result->
             when (result){
                 is Result.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
                 is Result.Success ->{
                     binding.progressBar.visibility = View.GONE
+                    if (result.data.isEmpty()) {
+                        binding.emptyContainer.show()
+                        return@Observer
+                    }else{
+                        binding.emptyContainer.hide()
+                    }
                     binding.rvHome.adapter = HomeScreenAdapter(result.data)
                 }
                 is Result.Failure ->{
