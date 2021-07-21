@@ -8,27 +8,25 @@ import com.example.blogapp.core.Result
 import com.example.blogapp.data.model.Post
 import com.example.blogapp.domain.home.HomeScreenRepo
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class HomeScreenViewModel(private val repo: HomeScreenRepo): ViewModel() {
-    fun fetchLatestPost() = liveData(Dispatchers.IO){
+    fun fetchLatestPost() = liveData(Dispatchers.IO) {
         emit(Result.Loading())
         try {
             emit(repo.getLastestPost())
-        }catch(e:Exception){
+        } catch (e: Exception) {
             emit(Result.Failure(e))
         }
     }
 
-    val lastestPosts : StateFlow<Result<List<Post>>> = flow {
+    val lastestPosts: StateFlow<Result<List<Post>>> = flow {
         runCatching {
             repo.getLastestPost()
         }.onSuccess {
             emit(it)
-        }.onFailure{throwable ->
+        }.onFailure { throwable ->
             emit(Result.Failure(Exception(throwable)))
         }
     }.stateIn(
@@ -36,7 +34,20 @@ class HomeScreenViewModel(private val repo: HomeScreenRepo): ViewModel() {
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = Result.Loading()
     )
+
+    private val posts = MutableStateFlow<Result<List<Post>>>(Result.Loading())
+    fun fetchPost() = viewModelScope.launch {
+        runCatching {
+            repo.getLastestPost()
+        }.onSuccess {
+            posts.value = it
+        }.onFailure { throwable ->
+            posts.value = Result.Failure(Exception(throwable))
+        }
+    }
+    fun getPosts(): StateFlow<Result<List<Post>>> = posts
 }
+
 
 class HomeScreenViewModelFactory(private val repo: HomeScreenRepo): ViewModelProvider.Factory{
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
